@@ -77,10 +77,16 @@
     ].filter(Boolean).join("\n\n");
   }
 
-  function task(table, seat, log, kind) {
+  function task(table, seat, log, kind, passages) {
     var name = table.people[seat].name;
     var wrote = log.some(function (e) { return e.you; });
     var ask;
+    // Passages change with every message, so they go here and not into the instructions, which stay the same
+    // from call to call.
+    var read = passages && passages.length ? [
+      "From your own writings, passages that bear on this. They are for you, not for the table: think with them if they help, say it in your own words, never repeat their wording.",
+      passages.map(function (p) { return "[" + p.work + "]\n" + p.text; }).join("\n\n")
+    ].join("\n\n") : "";
     if (kind === "open") {
       ask = "A newcomer is walking up to the table and has not sat down yet. Open the conversation on the table's question, speaking to the other two.";
     } else if (kind === "turn") {
@@ -89,6 +95,7 @@
       ask = "Speak now. Answer " + speaker(table, log[log.length - 1]) + " directly.";
     }
     return [
+      read,
       log.length ? "The conversation at the table so far:\n\n" + transcript(table, log) : "",
       ask,
       wrote ? "Speak in the language of the newcomer's last message." : "Speak English.",
@@ -112,9 +119,31 @@
     return hit;
   }
 
-  // What reaches the screen: no name label, no stage directions, no sentence that opens or sits inside a quote,
-  // and no more than about 70 words, cut at the end of a sentence.
-  function clean(text, table) {
+  // Runs of this many words in a row count as the passage's wording, quote marks or not.
+  var COPIED = 8;
+
+  function wordsOf(s) { return String(s).toLowerCase().match(/[\p{L}\p{N}]+/gu) || []; }
+
+  function runs(passages) {
+    var set = new Set();
+    (passages || []).forEach(function (p) {
+      var w = wordsOf(p.text);
+      for (var i = 0; i + COPIED <= w.length; i++) set.add(w.slice(i, i + COPIED).join(" "));
+    });
+    return set;
+  }
+
+  function copies(sentence, set) {
+    if (!set.size) return false;
+    var w = wordsOf(sentence);
+    for (var i = 0; i + COPIED <= w.length; i++) if (set.has(w.slice(i, i + COPIED).join(" "))) return true;
+    return false;
+  }
+
+  // What reaches the screen: no name label, no stage directions, no sentence that opens or sits inside a quote
+  // or repeats a passage word for word, and no more than about 70 words, cut at the end of a sentence.
+  function clean(text, table, passages) {
+    var copied = runs(passages);
     var s = String(text || "").trim();
     var names = table.people.map(function (p) { return escape(p.name); }).join("|");
     s = s.replace(new RegExp("^[*_\\s]*(" + names + ")[*_\\s]*:[*_\\s]*", "i"), "");
@@ -128,7 +157,7 @@
     var state = { double: false, single: false }, kept = [], words = 0;
     sentences.forEach(function (sentence) {
       var inside = state.double || state.single;
-      if (quoteMarks(sentence, state) || inside) return;
+      if (quoteMarks(sentence, state) || inside || copies(sentence, copied)) return;
       var n = sentence.split(/\s+/).filter(Boolean).length;
       if (kept.length && words + n > MAX_WORDS) { words = Infinity; return; }
       if (words === Infinity) return;
@@ -139,41 +168,55 @@
 
   // One philosopher's line. The log is copied at once, so later lines do not leak into this call.
   // A reply that is empty after cleaning is asked for once more; after that the philosopher stays silent.
-  async function line(table, seat, log, kind, complete, signal) {
+  async function line(table, seat, log, kind, complete, signal, passages) {
     var seen = log.slice();
     var loaded = await Promise.all([record(table.people[seat]), json("philosophers/common-rules.json")]);
     var messages = [
       { role: "system", content: instructions(table, seat, loaded[0], loaded[1].rules) },
-      { role: "user", content: task(table, seat, seen, kind) }
+      { role: "user", content: task(table, seat, seen, kind, passages) }
     ];
     for (var attempt = 0; attempt < 2; attempt++) {
-      var text = clean(await complete(messages, signal), table);
+      var text = clean(await complete(messages, signal), table, passages);
       if (text) return text;
     }
     return "";
   }
 
-  // Who answers the newcomer: anyone named in the message, otherwise a short call picks one or two.
+  // Who answers the newcomer, and the words to search their books with. Anyone named in the message answers;
+  // otherwise the same short call picks one or two. The search words are always asked for, in English,
+  // because the newcomer may write in any language and the books are in English.
   async function pick(table, log, complete, signal) {
     var last = log[log.length - 1];
     var named = mentioned(table, last.text).slice(0, 2);
-    if (named.length) return named;
-
     var people = table.people.map(function (p) { return p.name; });
     var reply = await complete([
-      { role: "system", content: "You choose who speaks next at a table of philosophers. Reply with one or two names and nothing else." },
+      { role: "system", content: "You help run a table of philosophers. Reply in exactly the format asked for and nothing else." },
       { role: "user", content: [
         "The question at the table: " + table.question,
         "At the table:\n" + table.people.map(function (p) { return "- " + p.name + ": " + p.stance; }).join("\n"),
         "The conversation so far:\n\n" + transcript(table, log),
-        "Who should answer the newcomer's last message? Put first the one it concerns most. Add a second name only if that person would clearly want to answer the first. Use only these names: " + people.join(", ") + "."
+        named.length
+          ? "Reply with one line: Search: then 4 to 8 English words for what the newcomer's last message is about, words these philosophers would use in their own books."
+          : "Reply with two lines.\nSpeakers: who should answer the newcomer's last message. Put first the one it concerns most. Add a second name only if that person would clearly want to answer the first. Use only these names: " + people.join(", ") + ".\nSearch: 4 to 8 English words for what the newcomer's last message is about, words these philosophers would use in their own books."
       ].join("\n\n") }
     ], signal);
-    var chosen = mentioned(table, reply).slice(0, 2);
-    if (chosen.length) return chosen;
+    // Models often drop the labels and send the lines bare, so a line without a label is read by its place:
+    // the speakers first, the search words last.
+    var lines = String(reply).split("\n").map(function (l) { return l.replace(/[*_#]/g, "").trim(); }).filter(Boolean);
+    function labelled(label) {
+      var hit = lines.find(function (l) { return new RegExp("^" + label + "\\s*:", "i").test(l); });
+      return hit ? hit.replace(/^[^:]*:/, "") : null;
+    }
+    var search = labelled("search");
+    if (search === null && lines.length && (named.length || lines.length > 1)) search = lines[lines.length - 1];
+    var words = search ? search.split(/[\s,;.]+/).filter(Boolean).slice(0, 12) : [last.text];
+    if (named.length) return { seats: named, words: words };
+    var speakers = labelled("speakers");
+    var chosen = mentioned(table, speakers !== null ? speakers : lines[0] || "").slice(0, 2);
+    if (chosen.length) return { seats: chosen, words: words };
     // An unreadable answer falls back to the last philosopher who spoke, who is usually the one the newcomer answered.
-    for (var i = log.length - 1; i >= 0; i--) if (!log[i].you) return [log[i].seat];
-    return [0];
+    for (var i = log.length - 1; i >= 0; i--) if (!log[i].you) return { seats: [log[i].seat], words: words };
+    return { seats: [0], words: words };
   }
 
   // You carry on: the two who have been silent longest speak, the quieter one first.

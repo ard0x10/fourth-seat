@@ -336,13 +336,14 @@
 </div>
 
 <script src="data.js"></script>
+<script src="corpus.js"></script>
 <script src="talk.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var door = $("door"), room = $("room"), scene = $("scene");
   var say = $("say"), you = $("you"), trail = $("trail");
-  var state = { table: null, sent: false, log: [] };
+  var state = { table: null, sent: false, log: [], search: [], given: [[], [], []] };
   // The account lives in this browser only: the key, whether it has credits, and the model choice.
   var STORE = "fourth-seat", PENDING = "fourth-seat-connect";
   var saved = read("localStorage", STORE) || {};
@@ -517,8 +518,12 @@
   async function live(plan, keepLast) {
     var me = begin(), signal = talking.signal, t = state.table, shown = 0;
     function request(step) {
-      var job = { done: false };
-      job.promise = Talk.line(t, step.seat, state.log, step.kind, complete, signal);
+      var job = { done: false }, given = state.given[step.seat];
+      // The search words of the last message; a passage goes to the same philosopher once per sitting.
+      job.promise = Corpus.find(t.people[step.seat], state.search, given, 3).then(function (passages) {
+        passages.forEach(function (p) { given.push(p.i); });
+        return Talk.line(t, step.seat, state.log, step.kind, complete, signal, passages);
+      });
       job.promise.then(function () { job.done = true; }, function () { job.done = true; });
       return job;
     }
@@ -561,7 +566,7 @@
 
   function toPreview(t) {
     stop();
-    state = { table: t, sent: false, log: [] };
+    state = { table: t, sent: false, log: [], search: [], given: [[], [], []] };
     door.hidden = true; room.hidden = false; room.dataset.phase = "preview";
     scene.style.backgroundImage = "url(" + (t.scene || "assets/room.jpg") + ")";
     hideLine(); glow(-1);
@@ -626,6 +631,9 @@
     $("care").hidden = true;
     room.dataset.phase = "seated";
     var t = state.table, me = run;
+    Corpus.load(t);
+    // Before the newcomer has said anything, the table's own question is what the books are searched with.
+    state.search = [t.question];
     await wait(700);
     if (me !== run) return;
     if (acct.connected && acct.credits) {
@@ -672,15 +680,16 @@
   async function answer(text) {
     var t = state.table, me = begin();
     $("carry").hidden = true;
-    var seats;
+    var picked;
     try {
-      seats = await Talk.pick(t, state.log, complete, talking.signal);
+      picked = await Talk.pick(t, state.log, complete, talking.signal);
     } catch (e) {
       if (me === run) giveBack(text);
       return;
     }
     if (me !== run) return;
-    var r = await live(seats.map(function (s) { return { seat: s, kind: "reply" }; }), true);
+    state.search = picked.words;
+    var r = await live(picked.seats.map(function (s) { return { seat: s, kind: "reply" }; }), true);
     if (r.cancelled) return;
     if (r.failed && !r.shown) { giveBack(text); return; }
     $("carry").hidden = false;
@@ -812,6 +821,7 @@
       clearStances();
       $("preview-block").hidden = true; $("sit").hidden = true;
       room.dataset.phase = "seated";
+      Corpus.load(t);
       // Before connecting, the visitor heard the written opening, so that is what the table remembers.
       state.log = t.opening.concat([t.turn]).map(function (l) { return { seat: l[0], text: l[1] }; });
       youSay(back.message);
