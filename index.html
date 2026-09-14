@@ -97,6 +97,11 @@
   .say.on { opacity: 1; transform: none; }
   .say .who { font-family: var(--label); font-size: .95rem; letter-spacing: .04em; text-transform: lowercase; color: var(--amber); margin-bottom: .35rem; }
   .say .line { font-size: clamp(1.1rem, 1.45vw, 1.4rem); line-height: 1.45; }
+  .say .dots { display: inline-flex; gap: .4em; padding: .5em 0; }
+  .say .dots i { width: .4em; height: .4em; border-radius: 50%; background: var(--ink); opacity: .25; animation: dot 1.2s ease-in-out infinite; }
+  .say .dots i:nth-child(2) { animation-delay: .2s; }
+  .say .dots i:nth-child(3) { animation-delay: .4s; }
+  @keyframes dot { 40% { opacity: .9; } }
 
   .stance .line { font-size: clamp(1rem, 1.2vw, 1.15rem); color: var(--ink); font-style: italic; }
 
@@ -249,6 +254,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
+    .say .dots i { animation: none; opacity: .6; }
   }
 </style>
 </head>
@@ -330,12 +336,13 @@
 </div>
 
 <script src="data.js"></script>
+<script src="talk.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var door = $("door"), room = $("room"), scene = $("scene");
   var say = $("say"), you = $("you"), trail = $("trail");
-  var state = { table: null, sent: false };
+  var state = { table: null, sent: false, log: [] };
   // The account lives in this browser only: the key, whether it has credits, and the model choice.
   var STORE = "fourth-seat", PENDING = "fourth-seat-connect";
   var saved = read("localStorage", STORE) || {};
@@ -361,7 +368,7 @@
   function persist() {
     write("localStorage", STORE, { key: key, credits: acct.credits, model: acct.model, custom: acct.custom });
   }
-  var run = 0, skip = null, current = null;
+  var run = 0, skip = null, current = null, talking = null;
 
   // Door: one card per table
   TABLES.forEach(function (t) {
@@ -418,22 +425,37 @@
     });
   }
 
-  function showLine(line) {
+  function showSpeaker(seat) {
     var t = state.table;
-    say.replaceChild(avatar(t.people[line[0]]), say.querySelector(".av"));
-    say.querySelector(".who").textContent = t.people[line[0]].name;
-    say.querySelector(".line").textContent = line[1];
+    say.replaceChild(avatar(t.people[seat]), say.querySelector(".av"));
+    say.querySelector(".who").textContent = t.people[seat].name;
     if (stacked()) { $("stack").appendChild(say); } else { room.appendChild(say); }
-    place(say, line[0]);
-    glow(line[0]);
+    place(say, seat);
+    glow(seat);
     say.classList.add("on");
+  }
+
+  // Every line that reaches the screen goes into the table's log, which is what the philosophers hear.
+  function showLine(line) {
+    say.querySelector(".line").textContent = line[1];
+    say.classList.remove("thinking");
+    showSpeaker(line[0]);
+    state.log.push({ seat: line[0], text: line[1] });
     current = line;
+  }
+
+  // While a philosopher's line is on its way, their name stands where the line will appear.
+  function showThinking(seat) {
+    current = null;
+    say.querySelector(".line").innerHTML = '<span class="dots"><i></i><i></i><i></i></span>';
+    say.classList.add("thinking");
+    showSpeaker(seat);
   }
 
   // A line that leaves the screen is appended to the trail.
   function hideLine() {
     if (current) { toTrail(state.table.people[current[0]].name, current[1], false); current = null; }
-    say.classList.remove("on");
+    say.classList.remove("on", "thinking");
   }
 
   function toTrail(name, text, me) {
@@ -463,8 +485,20 @@
     if (e.pointerType !== "mouse") reading(!trail.classList.contains("reading"));
   });
 
+  // Starting anything new stops whatever the table was doing, including model calls still on their way.
+  function stop() {
+    run++;
+    if (talking) talking.abort();
+    talking = null;
+  }
+  function begin() {
+    stop();
+    talking = new AbortController();
+    return run;
+  }
+
   async function play(lines, keepLast) {
-    var me = ++run;
+    var me = begin();
     for (var i = 0; i < lines.length; i++) {
       if (me !== run) return false;
       hideLine();
@@ -478,14 +512,56 @@
     return true;
   }
 
+  // Lines from the model. The next line is requested as soon as the one before it arrives,
+  // so most of the waiting happens while the previous line is being read.
+  async function live(plan, keepLast) {
+    var me = begin(), signal = talking.signal, t = state.table, shown = 0;
+    function request(step) {
+      var job = { done: false };
+      job.promise = Talk.line(t, step.seat, state.log, step.kind, complete, signal);
+      job.promise.then(function () { job.done = true; }, function () { job.done = true; });
+      return job;
+    }
+    var next = request(plan[0]);
+    for (var i = 0; i < plan.length; i++) {
+      hideLine();
+      await wait(i === 0 ? 250 : 450);
+      if (me !== run) return { cancelled: true, shown: shown };
+      if (!next.done) { retireYou(); showThinking(plan[i].seat); }
+      var text;
+      try {
+        text = await next.promise;
+      } catch (e) {
+        if (me !== run) return { cancelled: true, shown: shown };
+        hideLine(); glow(-1);
+        return { failed: true, shown: shown };
+      }
+      if (me !== run) return { cancelled: true, shown: shown };
+      if (text) { retireYou(); showLine([plan[i].seat, text]); shown++; } else { hideLine(); }
+      if (i + 1 < plan.length) next = request(plan[i + 1]);
+      if (text) await wait(readTime(text));
+      if (me !== run) return { cancelled: true, shown: shown };
+    }
+    if (!keepLast) { hideLine(); glow(-1); }
+    return { shown: shown };
+  }
+
+  function shuffle(list) {
+    for (var i = list.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), x = list[i];
+      list[i] = list[j]; list[j] = x;
+    }
+    return list;
+  }
+
   // Views
   function toDoor() {
-    run++; room.hidden = true; door.hidden = false; hideLine(); glow(-1);
+    stop(); room.hidden = true; door.hidden = false; hideLine(); glow(-1);
   }
 
   function toPreview(t) {
-    run++;
-    state = { table: t, sent: false };
+    stop();
+    state = { table: t, sent: false, log: [] };
     door.hidden = true; room.hidden = false; room.dataset.phase = "preview";
     scene.style.backgroundImage = "url(" + (t.scene || "assets/room.jpg") + ")";
     hideLine(); glow(-1);
@@ -543,26 +619,71 @@
     seat();
   }
 
+  // An account with credits hears a new opening at every sitting: each philosopher once in a random order,
+  // then one of the first two turns to the newcomer. Everyone else hears the table's written opening.
+  // If the new opening fails before its first line, the written one plays instead.
   async function seat() {
     $("care").hidden = true;
     room.dataset.phase = "seated";
-    var t = state.table;
+    var t = state.table, me = run;
     await wait(700);
+    if (me !== run) return;
+    if (acct.connected && acct.credits) {
+      var order = shuffle([0, 1, 2]);
+      var plan = order.map(function (s, i) { return { seat: s, kind: i === 0 ? "open" : "reply" }; });
+      plan.push({ seat: order[Math.floor(Math.random() * 2)], kind: "turn" });
+      var r = await live(plan, true);
+      if (r.cancelled) return;
+      if (!r.failed || r.shown) { openField(); return; }
+    }
     var ok = await play(t.opening, false);
     if (!ok) return;
     ok = await play([t.turn], true);
     if (!ok) return;
+    openField();
+  }
+
+  function openField() {
     $("field").hidden = false;
     $("input").focus();
   }
 
-  async function answer() {
-    var t = state.table;
-    await wait(1600);
-    retireYou();
+  function youSay(text) {
+    you.querySelector(".line").textContent = text;
+    you.classList.add("on");
+    state.log.push({ you: true, text: text });
+    state.sent = true;
+  }
+
+  // Until the error screens exist, a message nobody could answer goes back into the field to be sent again.
+  function giveBack(text) {
+    hideLine(); glow(-1);
+    var last = state.log[state.log.length - 1];
+    if (last && last.you) state.log.pop();
+    if (you.classList.contains("on")) {
+      you.classList.remove("on");
+    } else if (trail.lastChild && trail.lastChild.classList.contains("me")) {
+      trail.removeChild(trail.lastChild);
+    }
+    $("input").value = text;
+    openField();
+  }
+
+  async function answer(text) {
+    var t = state.table, me = begin();
     $("carry").hidden = true;
-    var ok = await play(t.reply, true);
-    if (ok) $("carry").hidden = false;
+    var seats;
+    try {
+      seats = await Talk.pick(t, state.log, complete, talking.signal);
+    } catch (e) {
+      if (me === run) giveBack(text);
+      return;
+    }
+    if (me !== run) return;
+    var r = await live(seats.map(function (s) { return { seat: s, kind: "reply" }; }), true);
+    if (r.cancelled) return;
+    if (r.failed && !r.shown) { giveBack(text); return; }
+    $("carry").hidden = false;
   }
 
   $("sit").onclick = function () { location.hash = state.table.id + "/seat"; };
@@ -575,12 +696,11 @@
     var v = $("input").value.trim();
     if (!v) return;
     $("input").value = "";
-    run++; hideLine(); glow(-1);
-    you.querySelector(".line").textContent = v;
-    you.classList.add("on");
-    state.sent = true;
+    stop(); hideLine(); glow(-1);
+    retireYou();
+    youSay(v);
     if (!acct.connected) { showConnect(false); return; }
-    answer();
+    answer(v);
   };
 
   function showConnect(busy) {
@@ -603,10 +723,31 @@
 
   // OpenRouter connection
   // Every call goes through here, so the key only ever travels in a request header.
-  function api(path) {
+  function api(path, options) {
+    var o = options || {};
     var headers = { "HTTP-Referer": location.origin + location.pathname, "X-Title": OPENROUTER.title };
     if (key) headers.Authorization = "Bearer " + key;
-    return fetch(OPENROUTER.api + path, { headers: headers });
+    if (o.body) headers["Content-Type"] = "application/json";
+    return fetch(OPENROUTER.api + path, {
+      method: o.method || "GET", headers: headers, signal: o.signal,
+      body: o.body ? JSON.stringify(o.body) : undefined
+    });
+  }
+
+  // One model call with the model chosen in Settings. Presets can ask for a reasoning effort.
+  async function complete(messages, signal) {
+    var use = chosen();
+    var id = use === "custom" ? acct.custom.id : use;
+    var preset = MODELS.find(function (m) { return m.id === id; });
+    var body = { model: id, messages: messages };
+    if (preset && preset.reasoning) body.reasoning = { effort: preset.reasoning };
+    var r = await api("/chat/completions", { method: "POST", body: body, signal: signal });
+    if (r.status === 401) forget();
+    if (!r.ok) throw new Error("Model call failed: " + r.status);
+    var j = await r.json();
+    var msg = j.choices && j.choices[0] && j.choices[0].message;
+    if (!msg || typeof msg.content !== "string") throw new Error("Model call returned no text");
+    return msg.content;
   }
 
   function base64url(bytes) {
@@ -671,9 +812,9 @@
       clearStances();
       $("preview-block").hidden = true; $("sit").hidden = true;
       room.dataset.phase = "seated";
-      you.querySelector(".line").textContent = back.message;
-      you.classList.add("on");
-      state.sent = true;
+      // Before connecting, the visitor heard the written opening, so that is what the table remembers.
+      state.log = t.opening.concat([t.turn]).map(function (l) { return { seat: l[0], text: l[1] }; });
+      youSay(back.message);
       showConnect(true);
     } else {
       openSettings();
@@ -688,7 +829,7 @@
     } catch (e) {}
 
     if (back.message) {
-      if (acct.connected) { $("connect").hidden = true; $("field").hidden = false; answer(); }
+      if (acct.connected) { $("connect").hidden = true; $("field").hidden = false; answer(back.message); }
       else showConnect(false);
     } else {
       $("acct-btn").disabled = false;
@@ -840,8 +981,9 @@
   $("carry").onclick = async function () {
     $("carry").hidden = true;
     retireYou();
-    var ok = await play(state.table.carry, true);
-    if (ok) $("carry").hidden = false;
+    var q = Talk.quiet(state.table, state.log);
+    var r = await live([{ seat: q[0], kind: "reply" }, { seat: q[1], kind: "reply" }], true);
+    if (!r.cancelled) $("carry").hidden = false;
   };
 
   // Clicking the scene skips the line that is waiting.

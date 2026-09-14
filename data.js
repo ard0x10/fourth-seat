@@ -1,4 +1,5 @@
-// Table data. Every line here is pre-written; nothing calls a model yet.
+// Table data. The opening and turn lines are written in advance: a visitor who is not connected, or has no credits, hears them.
+// aka: other spellings of a name that count as addressing that philosopher.
 // seat: 0 left, 1 middle, 2 right (where the figures sit in the scene image).
 
 window.SEATS = [
@@ -14,8 +15,8 @@ window.TABLES = [
     question: "What is real?",
     scene: "assets/tables/being.jpg",
     people: [
-      { name: "Plato", stance: "Only the Forms are truly real.", img: "assets/portraits/plato.jpg" },
-      { name: "Aristotle", stance: "Real things are the ones in front of you.", img: "assets/portraits/aristotle.jpg" },
+      { name: "Plato", aka: ["Platon"], stance: "Only the Forms are truly real.", img: "assets/portraits/plato.jpg" },
+      { name: "Aristotle", aka: ["Aristoteles", "Aristote"], stance: "Real things are the ones in front of you.", img: "assets/portraits/aristotle.jpg" },
       { name: "Heidegger", stance: "You forgot to ask what being even means.", img: "assets/portraits/heidegger.jpg" }
     ],
     opening: [
@@ -23,15 +24,7 @@ window.TABLES = [
       [1, "Plato, it is this chair that will hold him up. No shadow ever held anyone."],
       [2, "You both talk about what the chair is. Neither of you asks what it means that it is at all."]
     ],
-    turn: [1, "Newcomer. Settle this for us. Is your chair real?"],
-    reply: [
-      [1, "You answered like someone who has actually sat down. Good. Now tell me what would be left of the chair if the wood were gone."],
-      [0, "Nothing you could touch, and yet you would still know what a chair is. Ask yourself where that knowledge lives."]
-    ],
-    carry: [
-      [2, "Look at them. Two thousand years, and still arguing over the furniture."],
-      [0, "And you would rather argue over a single word."]
-    ]
+    turn: [1, "Newcomer. Settle this for us. Is your chair real?"]
   },
   {
     id: "knowledge",
@@ -48,15 +41,7 @@ window.TABLES = [
       [1, "And from that single thought you rebuilt the whole world. I only ever find habits. The sun rose yesterday, so we expect it tomorrow."],
       [2, "You are both half right, which is the most irritating way to be wrong."]
     ],
-    turn: [1, "You there. How do you know the floor will still be under your chair a minute from now?"],
-    reply: [
-      [1, "You trust it because it has always been there. That is not knowledge, my friend. That is custom, and custom is a very good servant."],
-      [2, "Yet you could not even expect it without a mind that orders experience in time. Something in you arrives before the evidence does."]
-    ],
-    carry: [
-      [0, "Then let us find what arrives first, and build on it."],
-      [1, "He wants foundations. I would settle for breakfast."]
-    ]
+    turn: [1, "You there. How do you know the floor will still be under your chair a minute from now?"]
   },
   {
     id: "ethics",
@@ -64,7 +49,7 @@ window.TABLES = [
     question: "What is the right thing to do?",
     scene: "assets/tables/ethics.jpg",
     people: [
-      { name: "Aristotle", stance: "Whatever a person of good character would do.", img: "assets/portraits/aristotle.jpg" },
+      { name: "Aristotle", aka: ["Aristoteles", "Aristote"], stance: "Whatever a person of good character would do.", img: "assets/portraits/aristotle.jpg" },
       { name: "Kant", stance: "Your duty, whatever the consequences.", img: "assets/portraits/kant.jpg" },
       { name: "Mill", stance: "The most happiness for the most people.", img: "assets/portraits/mill.jpg" }
     ],
@@ -73,15 +58,7 @@ window.TABLES = [
       [2, "Then your rule hands the friend to the murderer. Count the suffering, not the syllables."],
       [0, "You both want a formula. A good person does not consult one. They see what the situation asks of them."]
     ],
-    turn: [2, "You have a friend hiding in your house and a killer at the door asking where they are. What do you say?"],
-    reply: [
-      [2, "Notice that you weighed the outcomes before you weighed the words. Most people do, whatever they claim in a classroom."],
-      [1, "And notice how quickly a good reason becomes a permission. Tomorrow the reason will be smaller."]
-    ],
-    carry: [
-      [0, "Neither of you would recognise a wise person if one sat down at this table."],
-      [2, "One just did. We are testing them."]
-    ]
+    turn: [2, "You have a friend hiding in your house and a killer at the door asking where they are. What do you say?"]
   },
   {
     id: "art",
@@ -89,7 +66,7 @@ window.TABLES = [
     question: "What is art for?",
     scene: "assets/tables/art.jpg",
     people: [
-      { name: "Plato", stance: "A copy of a copy, and a dangerous one.", img: "assets/portraits/plato.jpg" },
+      { name: "Plato", aka: ["Platon"], stance: "A copy of a copy, and a dangerous one.", img: "assets/portraits/plato.jpg" },
       { name: "Kant", stance: "A pleasure that wants nothing from us.", img: "assets/portraits/kant.jpg" },
       { name: "Nietzsche", stance: "The thing that makes life bearable.", img: "assets/portraits/nietzsche.jpg" }
     ],
@@ -98,15 +75,7 @@ window.TABLES = [
       [2, "Then your city would be unbearable. Without art we would drown in the truth."],
       [1, "Beauty is neither useful nor true. It pleases us without wanting anything from us, and that is exactly its worth."]
     ],
-    turn: [2, "You. When did a song last make your life worth one more day?"],
-    reply: [
-      [2, "There. You did not describe it, you lived it again while you wrote. That is what Plato is afraid of."],
-      [0, "I am afraid of it because it works. A feeling that strong carries a lie as easily as a truth."]
-    ],
-    carry: [
-      [1, "Can we at least agree that liking something is not the same as it being good?"],
-      [2, "No."]
-    ]
+    turn: [2, "You. When did a song last make your life worth one more day?"]
   },
   {
     id: "politics",
@@ -123,15 +92,7 @@ window.TABLES = [
       [1, "People are born free. You have only described what the chains have made of them."],
       [2, "You both talk about people in general. Tell me who owns the factory and who works in it."]
     ],
-    turn: [0, "Newcomer. If no police came tomorrow, would you still lock your door?"],
-    reply: [
-      [0, "You would. Everyone would. That lock is my whole argument."],
-      [1, "Or the lock is what a society of strangers taught you. In a village where everyone is known, doors stay open."]
-    ],
-    carry: [
-      [2, "And who made the lock, and who was paid for making it?"],
-      [0, "There he goes again."]
-    ]
+    turn: [0, "Newcomer. If no police came tomorrow, would you still lock your door?"]
   },
   {
     id: "religion",
@@ -139,7 +100,7 @@ window.TABLES = [
     question: "Can reason reach God?",
     scene: "assets/tables/religion.jpg",
     people: [
-      { name: "Al-Ghazali", stance: "The philosophers' reason is not enough.", img: "assets/portraits/ghazali.jpg" },
+      { name: "Al-Ghazali", aka: ["Gazali", "Gazzali"], stance: "The philosophers' reason is not enough.", img: "assets/portraits/ghazali.jpg" },
       { name: "Hume", stance: "There is no good reason to believe in miracles.", img: "assets/portraits/hume.jpg" },
       { name: "Kierkegaard", stance: "Faith begins where reason stops.", img: "assets/portraits/kierkegaard.jpg" }
     ],
@@ -148,15 +109,7 @@ window.TABLES = [
       [1, "Then perhaps there was no door. A sensible person believes only as far as the evidence goes."],
       [2, "Evidence! Faith that waits for evidence is not faith. It is bookkeeping."]
     ],
-    turn: [2, "And you, stranger. Would you jump if no one could promise you the ground?"],
-    reply: [
-      [2, "You hesitated. Good. Anyone who does not hesitate has not understood the question."],
-      [0, "Hesitation is where I began too. It lasted months, and it did not end in an argument."]
-    ],
-    carry: [
-      [1, "It ended in a feeling, which is exactly my point."],
-      [2, "A feeling is not the smallest thing a person can have."]
-    ]
+    turn: [2, "And you, stranger. Would you jump if no one could promise you the ground?"]
   },
   {
     id: "science",
@@ -173,15 +126,7 @@ window.TABLES = [
       [1, "A thousand white swans prove nothing. One black swan settles it. Science is whatever could turn out to be wrong."],
       [2, "You describe science as it ought to be. Watch real scientists and you will see them ignore black swans for decades."]
     ],
-    turn: [1, "You there. Name something you believe that no evidence could ever change."],
-    reply: [
-      [1, "Then you have found the place where you stop doing science. Everyone has one. The honest ones know where it is."],
-      [2, "Or you have found your paradigm. Without a place like that nobody could do science at all."]
-    ],
-    carry: [
-      [0, "In my day we simply went outside and looked."],
-      [1, "Looked at what? You needed a question first."]
-    ]
+    turn: [1, "You there. Name something you believe that no evidence could ever change."]
   },
   {
     id: "meaning",
@@ -199,15 +144,7 @@ window.TABLES = [
       [1, "I have asked myself every night for decades. Somehow the asking is what kept me here."],
       [2, "Then ask it differently. If you had to live this exact life again, every hour of it, would you say yes?"]
     ],
-    turn: [0, "You have only just sat down, so you are not tired of us yet. What keeps you going on an ordinary Tuesday?"],
-    reply: [
-      [0, "Small things, then. People underestimate them. Carrying on through an ordinary Tuesday is already a kind of revolt."],
-      [2, "Not carrying on. Loving it. There is a difference, and it matters."]
-    ],
-    carry: [
-      [1, "You two make it sound so energetic. Some of us simply stay, and call it clarity."],
-      [0, "Staying is enough."]
-    ]
+    turn: [0, "You have only just sat down, so you are not tired of us yet. What keeps you going on an ordinary Tuesday?"]
   }
 ];
 
