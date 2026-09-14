@@ -341,7 +341,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var door = $("door"), room = $("room"), scene = $("scene");
   var say = $("say"), you = $("you"), trail = $("trail");
-  var state = { table: null, sent: false, log: [], search: [], given: [[], [], []] };
+  var state = { table: null, sent: false, log: [], search: [], given: [[], [], []], opening: 0 };
   // The account lives in this browser only: the key, whether it has credits, and the model choice.
   var STORE = "fourth-seat", PENDING = "fourth-seat-connect";
   var saved = read("localStorage", STORE) || {};
@@ -564,7 +564,7 @@
 
   function toPreview(t) {
     stop();
-    state = { table: t, sent: false, log: [], search: [], given: [[], [], []] };
+    state = { table: t, sent: false, log: [], search: [], given: [[], [], []], opening: 0 };
     door.hidden = true; room.hidden = false; room.dataset.phase = "preview";
     scene.style.backgroundImage = "url(" + (t.scene || "assets/room.jpg") + ")";
     hideLine(); glow(-1);
@@ -622,7 +622,7 @@
   }
 
   // An account with credits hears a new opening at every sitting: each philosopher once in a random order,
-  // then one of the first two turns to the newcomer. Everyone else hears the table's written opening.
+  // then one of the first two turns to the newcomer. Everyone else hears the table's written openings in turn.
   // If the new opening fails before its first line, the written one plays instead.
   async function seat() {
     $("care").hidden = true;
@@ -641,11 +641,23 @@
       if (r.cancelled) return;
       if (!r.failed || r.shown) { openField(); return; }
     }
-    var ok = await play(t.opening, false);
+    var o = writtenOpening(t);
+    var ok = await play(o.lines, false);
     if (!ok) return;
-    ok = await play([t.turn], true);
+    ok = await play([o.turn], true);
     if (!ok) return;
     openField();
+  }
+
+  // Which written opening a table plays next is kept in this browser, so the next sitting hears the next one.
+  var OPENINGS = "fourth-seat-openings";
+  function writtenOpening(t) {
+    var next = read("localStorage", OPENINGS) || {};
+    var i = (next[t.id] || 0) % t.openings.length;
+    next[t.id] = (i + 1) % t.openings.length;
+    write("localStorage", OPENINGS, next);
+    state.opening = i;
+    return t.openings[i];
   }
 
   function openField() {
@@ -723,7 +735,7 @@
   $("connect-why").onclick = function () { $("connect-why-text").hidden = !$("connect-why-text").hidden; };
   $("connect-go").onclick = function () {
     showConnect(true);
-    connect({ table: state.table.id, message: you.querySelector(".line").textContent }).catch(function () { showConnect(false); });
+    connect({ table: state.table.id, message: you.querySelector(".line").textContent, opening: state.opening }).catch(function () { showConnect(false); });
   };
 
   // OpenRouter connection
@@ -818,8 +830,9 @@
       $("preview-block").hidden = true; $("sit").hidden = true;
       room.dataset.phase = "seated";
       Corpus.load(t);
-      // Before connecting, the visitor heard the written opening, so that is what the table remembers.
-      state.log = t.opening.concat([t.turn]).map(function (l) { return { seat: l[0], text: l[1] }; });
+      // Before connecting, the visitor heard a written opening, so that is what the table remembers.
+      var o = t.openings[back.opening] || t.openings[0];
+      state.log = o.lines.concat([o.turn]).map(function (l) { return { seat: l[0], text: l[1] }; });
       youSay(back.message);
       showConnect(true);
     } else {
