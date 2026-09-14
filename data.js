@@ -227,12 +227,12 @@ window.CONNECT = {
 };
 
 // Preset models in Settings. The first is free; an account without credits uses it automatically.
+// reasoning: effort level to request from models that support it.
 window.MODELS = [
   { id: "google/gemma-4-31b-it:free", name: "Gemma 4 31B", note: "Free", free: true },
-  { id: "google/gemini-3.8-flash", name: "Gemini 3.8 Flash", note: "Paid" },
-  { id: "x-ai/grok-4.6", name: "Grok 4.6", note: "Paid, costs more" }
+  { id: "x-ai/grok-4.6", name: "Grok 4.6", note: "Paid", reasoning: "low" }
 ];
-window.DEFAULT_MODEL = "google/gemini-3.8-flash";
+window.DEFAULT_MODEL = "x-ai/grok-4.6";
 
 window.SETTINGS = {
   title: "Settings",
@@ -241,7 +241,7 @@ window.SETTINGS = {
   customNote: "Any model on OpenRouter",
   search: "Search models...",
   none: "Nothing found.",
-  freeLine: "Using the free model. Add credits to use Gemini 3.8 Flash.",
+  freeLine: "Using the free model. Add credits to use Grok 4.6.",
   account: "Account",
   connected: "Connected to OpenRouter",
   disconnect: "Disconnect",
