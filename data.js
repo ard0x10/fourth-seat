@@ -151,7 +151,7 @@ window.TABLES = [
 window.CARE = {
   text: "This table talks about life, death and despair. If you are going through something heavy right now, you don't have to face it alone.",
   help: "Find someone to talk to",
-  helpNote: "In the real site this opens a list of helplines by country.",
+  helpUrl: "https://findahelpline.com",
   go: "Take my seat"
 };
 

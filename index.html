@@ -159,7 +159,6 @@
     width: min(520px, 100% - 32px); text-align: center; line-height: 1.6; font-size: 1.2rem;
   }
   .care p { margin: 0 0 1.4rem; }
-  .care .note { font-size: .95rem; color: var(--dim); margin: -.6rem 0 1.2rem; }
 
   /* ---------- Trail: past lines ---------- */
   /* The last three lines stay as fading single lines; hovering (tapping on touch screens) opens the whole history. */
@@ -280,8 +279,7 @@
 
   <div class="care" id="care" hidden>
     <p id="care-text"></p>
-    <p><button class="link" id="care-help" type="button"></button></p>
-    <p class="note" id="care-note" hidden></p>
+    <p><a class="link" id="care-help" target="_blank" rel="noopener noreferrer"></a></p>
     <button class="btn warm" id="care-go" type="button"></button>
   </div>
 
@@ -615,8 +613,7 @@
       room.dataset.phase = "care";
       $("care-text").textContent = CARE.text;
       $("care-help").textContent = CARE.help;
-      $("care-note").textContent = CARE.helpNote;
-      $("care-note").hidden = true;
+      $("care-help").href = CARE.helpUrl;
       $("care-go").textContent = CARE.go;
       $("care").hidden = false;
       return;
@@ -697,7 +694,6 @@
 
   $("sit").onclick = function () { location.hash = state.table.id + "/seat"; };
   $("care-go").onclick = seat;
-  $("care-help").onclick = function () { $("care-note").hidden = false; };
   $("leave").onclick = function () { location.hash = ""; };
 
   $("field").onsubmit = function (e) {
