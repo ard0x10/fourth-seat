@@ -241,13 +241,25 @@ window.SETTINGS = {
   customNote: "Any model on OpenRouter",
   search: "Search models...",
   none: "Nothing found.",
+  loading: "Loading models...",
+  loadFailed: "Couldn't load the model list.",
   freeLine: "Using the free model. Add credits to use Grok 4.6.",
   account: "Account",
   connected: "Connected to OpenRouter",
   disconnect: "Disconnect",
   notConnected: "Not connected",
   connect: "Connect OpenRouter",
+  connecting: "Connecting...",
+  forgotten: "Forgotten on this device. To revoke the key itself, ",
+  revoke: "delete it in OpenRouter",
   done: "Done"
+};
+
+window.OPENROUTER = {
+  api: "https://openrouter.ai/api/v1",
+  auth: "https://openrouter.ai/auth",
+  keysPage: "https://openrouter.ai/settings/keys",
+  title: "Fourth Seat"
 };
 
 // How long a line stays on screen: scales with its length, clamped at both ends.

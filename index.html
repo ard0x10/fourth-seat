@@ -226,7 +226,7 @@
   .pick .tag { margin-left: auto; font-size: .85rem; color: var(--amber); }
   .custom-empty { padding: 10px 12px; color: var(--faint); font-style: italic; }
   .acct { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--dim); padding: 0 2px; }
-  .btn.small { padding: .45rem 1.1rem; font-size: .95rem; }
+  .acct-note { margin: .7rem 2px 0; font-size: .95rem; color: var(--dim); line-height: 1.5; }  .btn.small { padding: .45rem 1.1rem; font-size: .95rem; }
 
   /* ---------- Phone ---------- */
   @media (max-width: 760px) {
@@ -325,21 +325,42 @@
     <p class="free-note" id="free-note" hidden></p>
     <div class="group" id="account-label"></div>
     <div class="acct"><span id="acct-text"></span><button id="acct-btn" type="button"></button></div>
+    <p class="acct-note" id="acct-note" hidden><span></span><a class="link" target="_blank" rel="noopener noreferrer"></a>.</p>
   </div>
 </div>
 
 <script src="data.js"></script>
-<script src="models.js"></script>
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var door = $("door"), room = $("room"), scene = $("scene");
   var say = $("say"), you = $("you"), trail = $("trail");
   var state = { table: null, sent: false };
-  // The account carries over between tables. For previews, ?account=free starts connected without credits and ?account=credits with credits.
-  var start = new URLSearchParams(location.search).get("account");
-  var acct = { connected: start === "free" || start === "credits", credits: start !== "free", model: DEFAULT_MODEL, custom: null };
-  var customOpen = false;
+  // The account lives in this browser only: the key, whether it has credits, and the model choice.
+  var STORE = "fourth-seat", PENDING = "fourth-seat-connect";
+  var saved = read("localStorage", STORE) || {};
+  var key = saved.key || null;
+  var acct = {
+    connected: !!key,
+    credits: saved.credits !== false,
+    model: saved.model || DEFAULT_MODEL,
+    custom: saved.custom || null
+  };
+  var customOpen = false, forgotten = false, models = null;
+
+  // Storage can be blocked (private windows, site data turned off); the page still works for the visit.
+  // Even reading window.localStorage can throw, so the lookup happens inside the try.
+  function read(area, name) {
+    try { return JSON.parse(window[area].getItem(name)); } catch (e) { return null; }
+  }
+  function write(area, name, value) {
+    try {
+      if (value === null) window[area].removeItem(name); else window[area].setItem(name, JSON.stringify(value));
+    } catch (e) {}
+  }
+  function persist() {
+    write("localStorage", STORE, { key: key, credits: acct.credits, model: acct.model, custom: acct.custom });
+  }
   var run = 0, skip = null, current = null;
 
   // Door: one card per table
@@ -558,32 +579,130 @@
     you.querySelector(".line").textContent = v;
     you.classList.add("on");
     state.sent = true;
-    if (!acct.connected) {
-      var c = $("connect");
-      c.querySelector("h3").textContent = CONNECT.title;
-      c.querySelector("p").textContent = CONNECT.body;
-      $("connect-go").textContent = CONNECT.button;
-      $("connect-why").textContent = CONNECT.why;
-      $("connect-why-text").textContent = CONNECT.whyText;
-      $("connect-why-text").hidden = true;
-      c.hidden = false; $("field").hidden = true;
-      return;
-    }
+    if (!acct.connected) { showConnect(false); return; }
     answer();
   };
 
+  function showConnect(busy) {
+    var c = $("connect");
+    c.querySelector("h3").textContent = CONNECT.title;
+    c.querySelector("p").textContent = CONNECT.body;
+    $("connect-go").textContent = busy ? SETTINGS.connecting : CONNECT.button;
+    $("connect-go").disabled = busy;
+    $("connect-why").textContent = CONNECT.why;
+    $("connect-why-text").textContent = CONNECT.whyText;
+    $("connect-why-text").hidden = true;
+    c.hidden = false; $("field").hidden = true;
+  }
+
   $("connect-why").onclick = function () { $("connect-why-text").hidden = !$("connect-why-text").hidden; };
-  $("connect-go").onclick = async function () {
-    $("connect-go").textContent = "Connecting...";
-    await connect();
+  $("connect-go").onclick = function () {
+    showConnect(true);
+    connect({ table: state.table.id, message: you.querySelector(".line").textContent }).catch(function () { showConnect(false); });
   };
 
-  // Placeholder connection: waits a moment, then counts as connected. A message waiting for an answer gets one.
-  async function connect() {
-    await new Promise(function (r) { setTimeout(r, 1100); });
-    acct.connected = true;
-    if (!$("connect").hidden) { $("connect").hidden = true; $("field").hidden = false; answer(); }
+  // OpenRouter connection
+  // Every call goes through here, so the key only ever travels in a request header.
+  function api(path) {
+    var headers = { "HTTP-Referer": location.origin + location.pathname, "X-Title": OPENROUTER.title };
+    if (key) headers.Authorization = "Bearer " + key;
+    return fetch(OPENROUTER.api + path, { headers: headers });
   }
+
+  function base64url(bytes) {
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(bytes)))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  // Sign-in with PKCE: the page leaves for OpenRouter and comes back with a one-time code.
+  // Where the visitor was is kept for this tab, so they come back to the same moment.
+  async function connect(back) {
+    var verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
+    var challenge = base64url(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)));
+    back.verifier = verifier;
+    write("sessionStorage", PENDING, back);
+    location.assign(OPENROUTER.auth + "?callback_url=" + encodeURIComponent(location.origin + location.pathname) +
+      "&code_challenge=" + challenge + "&code_challenge_method=S256");
+  }
+
+  async function exchange(code, verifier) {
+    var r = await fetch(OPENROUTER.api + "/auth/keys", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: code, code_verifier: verifier, code_challenge_method: "S256" })
+    });
+    if (!r.ok) throw new Error("Key exchange failed: " + r.status);
+    var k = (await r.json()).key;
+    if (!k) throw new Error("Key exchange returned no key");
+    return k;
+  }
+
+  // Credits decide which models are open: the account balance must be above zero and the key's own limit not used up.
+  // "Has never bought credits" is not enough, since an account that bought once and spent it all would still count.
+  // A key OpenRouter no longer accepts (deleted on their side) counts as disconnected.
+  async function checkCredits() {
+    if (!key) return;
+    try {
+      var res = await Promise.all([api("/key"), api("/credits")]);
+      if (res[0].status === 401) { forget(); return; }
+      if (!res[0].ok || !res[1].ok) return;
+      var k = (await res[0].json()).data, c = (await res[1].json()).data;
+      var keyLeft = k.limit_remaining == null || k.limit_remaining > 0;
+      acct.credits = c.total_credits - c.total_usage > 0 && keyLeft;
+      persist();
+    } catch (e) {}
+  }
+
+  function forget() {
+    key = null; acct.connected = false;
+    persist();
+  }
+
+  // Back from OpenRouter: trade the code for a key, take the code out of the address bar, then pick up where the visitor left.
+  async function resume(code) {
+    var back = read("sessionStorage", PENDING) || {};
+    write("sessionStorage", PENDING, null);
+    var t = TABLES.find(function (x) { return x.id === back.table; });
+    history.replaceState(null, "", location.pathname + (t ? "#" + t.id + (back.message ? "/seat" : "") : ""));
+    if (!t || !back.verifier) return route();
+
+    toPreview(t);
+    if (back.message) {
+      clearStances();
+      $("preview-block").hidden = true; $("sit").hidden = true;
+      room.dataset.phase = "seated";
+      you.querySelector(".line").textContent = back.message;
+      you.classList.add("on");
+      state.sent = true;
+      showConnect(true);
+    } else {
+      openSettings();
+      $("acct-btn").textContent = SETTINGS.connecting; $("acct-btn").disabled = true;
+    }
+
+    try {
+      key = await exchange(code, back.verifier);
+      acct.connected = true; acct.credits = true; forgotten = false;
+      persist();
+      await checkCredits();
+    } catch (e) {}
+
+    if (back.message) {
+      if (acct.connected) { $("connect").hidden = true; $("field").hidden = false; answer(); }
+      else showConnect(false);
+    } else {
+      $("acct-btn").disabled = false;
+      renderSettings();
+    }
+  }
+
+  // Coming back with the browser's Back button restores the page as it was, busy buttons included.
+  addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    if (!$("connect").hidden) showConnect(false);
+    $("acct-btn").disabled = false;
+    if (!$("settings").hidden) renderSettings();
+  });
 
   // Settings
   function freeTier() { return acct.connected && !acct.credits; }
@@ -616,7 +735,7 @@
     box.innerHTML = "";
     MODELS.forEach(function (m) {
       box.appendChild(option(m.name, m.note, use === m.id && !customOpen, free && !m.free, function () {
-        acct.model = m.id; customOpen = false; renderSettings();
+        acct.model = m.id; customOpen = false; persist(); renderSettings();
       }));
     });
     var customNote = use === "custom" ? acct.custom.name : S.customNote;
@@ -631,11 +750,48 @@
     $("acct-text").textContent = acct.connected ? S.connected : S.notConnected;
     $("acct-btn").textContent = acct.connected ? S.disconnect : S.connect;
     $("acct-btn").className = acct.connected ? "link" : "btn warm small";
+    var note = $("acct-note");
+    note.querySelector("span").textContent = S.forgotten;
+    note.querySelector("a").textContent = S.revoke;
+    note.querySelector("a").href = OPENROUTER.keysPage;
+    note.hidden = !(forgotten && !acct.connected);
+  }
+
+  // The Custom list comes live from OpenRouter each visit, so it never needs regenerating. Batch endpoints are not meant for chat.
+  // A saved custom choice that is no longer on the list falls back to the default.
+  function loadModels() {
+    if (Array.isArray(models) || models === "loading") return;
+    models = "loading";
+    fetch(OPENROUTER.api + "/models").then(function (r) {
+      if (!r.ok) throw new Error("Model list failed: " + r.status);
+      return r.json();
+    }).then(function (j) {
+      models = j.data.filter(function (m) { return !/:batch$/.test(m.id); }).map(function (m) {
+        return { id: m.id, name: m.name.replace(/ \(free\)$/, ""), free: /:free$/.test(m.id) };
+      }).sort(function (a, b) { return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1; });
+      if (acct.custom) {
+        var live = models.find(function (m) { return m.id === acct.custom.id; });
+        acct.custom = live || null;
+        if (!live && acct.model === "custom") acct.model = DEFAULT_MODEL;
+        persist();
+      }
+    }).catch(function () {
+      models = "failed";
+    }).then(function () {
+      if (!$("settings").hidden) renderSettings();
+    });
   }
 
   function renderCustom() {
     var q = $("custom-q").value.trim().toLowerCase(), list = $("custom-list"), free = freeTier();
-    var hits = ALL_MODELS.filter(function (m) { return !q || m.name.toLowerCase().indexOf(q) >= 0; });
+    if (!Array.isArray(models)) {
+      list.innerHTML = "";
+      var wait = document.createElement("div");
+      wait.className = "custom-empty"; wait.textContent = models === "failed" ? SETTINGS.loadFailed : SETTINGS.loading;
+      list.appendChild(wait);
+      return;
+    }
+    var hits = models.filter(function (m) { return !q || m.name.toLowerCase().indexOf(q) >= 0; });
     // Without credits, the selectable free models come first and the paid ones follow, dimmed.
     if (free) hits = hits.filter(function (m) { return m.free; }).concat(hits.filter(function (m) { return !m.free; }));
     hits = hits.slice(0, 80);
@@ -652,14 +808,16 @@
       b.className = acct.custom && acct.custom.id === m.id ? "pick on" : "pick";
       b.innerHTML = '<span class="nm"></span>' + (m.free ? '<span class="tag">Free</span>' : "");
       b.querySelector(".nm").textContent = m.name;
-      b.onclick = function () { acct.custom = m; acct.model = "custom"; customOpen = false; renderSettings(); };
+      b.onclick = function () { acct.custom = m; acct.model = "custom"; customOpen = false; persist(); renderSettings(); };
       list.appendChild(b);
     });
   }
 
-  function openSettings(withCustom) {
-    customOpen = !!withCustom;
+  function openSettings() {
+    customOpen = false;
     $("custom-q").value = "";
+    if (models === "failed") models = null;
+    loadModels();
     renderSettings();
     $("settings").hidden = false;
     // Focus goes to the card: Tab moves through the options, Esc closes.
@@ -667,17 +825,16 @@
   }
   function closeSettings() { $("settings").hidden = true; }
 
-  $("gear").onclick = function () { openSettings(false); };
+  $("gear").onclick = openSettings;
   $("settings-close").onclick = closeSettings;
   $("settings").addEventListener("click", function (e) { if (e.target === $("settings")) closeSettings(); });
   addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("settings").hidden) closeSettings(); });
   $("custom-q").oninput = renderCustom;
-  $("acct-btn").onclick = async function () {
-    if (acct.connected) { acct.connected = false; renderSettings(); return; }
-    $("acct-btn").textContent = "Connecting..."; $("acct-btn").disabled = true;
-    await connect();
-    $("acct-btn").disabled = false;
-    renderSettings();
+  // Disconnect forgets the key on this device. The key itself stays in the OpenRouter account; only the owner can delete it there.
+  $("acct-btn").onclick = function () {
+    if (acct.connected) { forget(); forgotten = true; renderSettings(); return; }
+    $("acct-btn").textContent = SETTINGS.connecting; $("acct-btn").disabled = true;
+    connect({ table: state.table.id }).catch(function () { $("acct-btn").disabled = false; renderSettings(); });
   };
 
   $("carry").onclick = async function () {
@@ -709,10 +866,15 @@
     if (!t) return toDoor();
     toPreview(t);
     if (parts[1] === "seat") sit();
-    if (parts[1] === "settings") openSettings(parts[2] === "custom");
   }
   addEventListener("hashchange", route);
-  route();
+  var code = new URLSearchParams(location.search).get("code");
+  if (code) {
+    resume(code);
+  } else {
+    route();
+    checkCredits().then(function () { if (!$("settings").hidden) renderSettings(); });
+  }
 })();
 </script>
 </body>
