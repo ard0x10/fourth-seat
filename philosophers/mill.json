@@ -47,7 +47,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 34901,
-        "edition": "text of the author"
+        "edition": "text of the author",
+        "keep": [
+          [
+            "INTRODUCTORY.",
+            null
+          ]
+        ],
+        "opens": "The subject of this Essay is not the so-called Liberty of the Will",
+        "closes": "it has preferred to banish."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -61,7 +69,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 11224,
-        "edition": "Longmans, Green, seventh edition, 1879"
+        "edition": "Longmans, Green, seventh edition, 1879",
+        "keep": [
+          [
+            "GENERAL REMARKS.",
+            null
+          ]
+        ],
+        "opens": "There are few circumstances among those which make up the present condition of human knowledge",
+        "closes": "and by the sterner character of its sanctions."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -74,7 +90,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 27083,
-        "edition": "Longmans, Green, Reader, and Dyer, 1869"
+        "edition": "Longmans, Green, Reader, and Dyer, 1869",
+        "keep": [
+          [
+            "CHAPTER I.",
+            "THE END."
+          ]
+        ],
+        "opens": "The object of this Essay is to explain as clearly as I am able",
+        "closes": "all that makes life valuable to the individual human being."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

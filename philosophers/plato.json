@@ -64,7 +64,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 55201,
-        "edition": "Clarendon Press, third edition, 1888"
+        "edition": "Clarendon Press, third edition, 1888",
+        "keep": [
+          [
+            "THE REPUBLIC.",
+            "INDEX."
+          ]
+        ],
+        "opens": "I went down yesterday to the Piraeus with Glaucon the son of Ariston",
+        "closes": "in the pilgrimage of a thousand years which we have been describing."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -84,7 +92,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 76464,
-        "edition": "Oxford University Press, third edition, vol. 2, 1892"
+        "edition": "Oxford University Press, third edition, vol. 2, 1892",
+        "keep": [
+          [
+            "_Meno._ Can you tell me...",
+            "FOOTNOTES"
+          ]
+        ],
+        "opens": "Can you tell me, Socrates, whether virtue is acquired by teaching",
+        "closes": "you will have done good service to the Athenian people."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -103,7 +119,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 76464,
-        "edition": "Oxford University Press, third edition, vol. 2, 1892"
+        "edition": "Oxford University Press, third edition, vol. 2, 1892",
+        "keep": [
+          [
+            "_Echecrates._ Were you yourself, Phaedo...",
+            "FOOTNOTES"
+          ]
+        ],
+        "opens": "Were you yourself, Phaedo, in the prison with Socrates",
+        "closes": "he was the wisest and justest and best."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -119,8 +143,21 @@
           "died": 1893
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "wikisource",
+        "id": "The Dialogues of Plato (Jowett)/Symposium",
+        "edition": "Oxford University Press, third edition, vol. 1, 1892, scan",
+        "pages": [
+          "The Dialogues of Plato (Jowett)/Symposium"
+        ],
+        "opens": "Concerning the things about which you ask to be informed",
+        "closes": "In the evening he retired to rest at his own home."
+      },
+      "exclude": [
+        "Jowett's introduction and analysis",
+        "marginal analyses",
+        "notes"
+      ]
     },
     {
       "title": "Phaedrus",
@@ -131,8 +168,33 @@
           "died": 1893
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "archive",
+        "id": "b24750189_0001",
+        "edition": "Clarendon Press, third edition, vol. 1, 1892, scan",
+        "leaves": [
+          474,
+          532
+        ],
+        "reference": {
+          "site": "gutenberg",
+          "id": 1636,
+          "keep": [
+            [
+              "SOCRATES: My dear Phaedrus...",
+              null
+            ]
+          ]
+        },
+        "opens": "My dear Phaedrus, whence come you, and whither are you going?",
+        "closes": "Let us go."
+      },
+      "exclude": [
+        "Jowett's introduction and analysis",
+        "marginal analyses",
+        "Stephanus numbers",
+        "notes"
+      ]
     },
     {
       "title": "Ion",
@@ -143,8 +205,21 @@
           "died": 1893
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "wikisource",
+        "id": "The Dialogues of Plato (Jowett)/Ion",
+        "edition": "Oxford University Press, third edition, vol. 1, 1892, scan",
+        "pages": [
+          "The Dialogues of Plato (Jowett)/Ion"
+        ],
+        "opens": "Welcome, Ion. Are you from your native city of Ephesus?",
+        "closes": "attribute to you in your praises of Homer inspiration, and not art."
+      },
+      "exclude": [
+        "Jowett's introduction and analysis",
+        "marginal analyses",
+        "notes"
+      ]
     },
     {
       "title": "Timaeus",
@@ -155,8 +230,33 @@
           "died": 1893
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "archive",
+        "id": "b24750189_0003",
+        "edition": "Clarendon Press, third edition, vol. 3, 1892, scan",
+        "leaves": [
+          680,
+          760
+        ],
+        "reference": {
+          "site": "gutenberg",
+          "id": 1572,
+          "keep": [
+            [
+              "SOCRATES: One, two, three...",
+              null
+            ]
+          ]
+        },
+        "opens": "One, two, three; but where, my dear Timaeus",
+        "closes": "the one only-begotten heaven."
+      },
+      "exclude": [
+        "Jowett's introduction and analysis",
+        "marginal analyses",
+        "Stephanus numbers",
+        "notes"
+      ]
     }
   ]
 }

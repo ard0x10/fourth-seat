@@ -48,7 +48,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 3207,
-        "edition": "text of the first edition"
+        "edition": "text of the first edition",
+        "keep": [
+          [
+            "THE INTRODUCTION",
+            null
+          ]
+        ],
+        "opens": "Nature (the art whereby God hath made and governes the world)",
+        "closes": "is to all men welcome."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

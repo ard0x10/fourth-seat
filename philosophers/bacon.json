@@ -47,7 +47,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 5500,
-        "edition": "Cassell, 1893"
+        "edition": "Cassell, 1893",
+        "keep": [
+          [
+            "OF THE PROFICIENCE AND",
+            "FOOTNOTES."
+          ]
+        ],
+        "opens": "THERE were under the law, excellent King",
+        "closes": "to whom on earth I am most bounden."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -61,7 +69,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 575,
-        "edition": "text of the author"
+        "edition": "text of the author",
+        "keep": [
+          [
+            "TO",
+            "A Glossary Of Archaic Words And Phrases"
+          ]
+        ],
+        "opens": "A good Name is as a precious oyntment",
+        "closes": "as they have of the actions and designs themselves."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

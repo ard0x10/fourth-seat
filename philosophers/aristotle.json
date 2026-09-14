@@ -64,7 +64,21 @@
       "copy": {
         "site": "wikisource",
         "id": "Nicomachean Ethics (Chase)",
-        "edition": "Everyman's Library, 1911, scan"
+        "edition": "Everyman's Library, 1911, scan",
+        "pages": [
+          "Nicomachean Ethics (Chase)/Book One",
+          "Nicomachean Ethics (Chase)/Book Two",
+          "Nicomachean Ethics (Chase)/Book Three",
+          "Nicomachean Ethics (Chase)/Book Four",
+          "Nicomachean Ethics (Chase)/Book Five",
+          "Nicomachean Ethics (Chase)/Book Six",
+          "Nicomachean Ethics (Chase)/Book Seven",
+          "Nicomachean Ethics (Chase)/Book Eight",
+          "Nicomachean Ethics (Chase)/Book Nine",
+          "Nicomachean Ethics (Chase)/Book Ten"
+        ],
+        "opens": "Every art, and every science reduced to a teachable form",
+        "closes": "To this let us now proceed."
       },
       "exclude": [
         "introduction by J. A. Smith",
@@ -84,7 +98,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 6762,
-        "edition": "J. M. Dent, Everyman's Library, first issue 1912"
+        "edition": "J. M. Dent, Everyman's Library, first issue 1912",
+        "keep": [
+          [
+            "BOOK I",
+            "INDEX"
+          ]
+        ],
+        "opens": "As we see that every city is a society",
+        "closes": "moderation, possibility, and decorum."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -106,7 +128,12 @@
       "copy": {
         "site": "wikisource",
         "id": "The Poetics translated by S. H. Butcher",
-        "edition": "Macmillan, 1922, scan"
+        "edition": "Macmillan, 1922, scan",
+        "pages": [
+          "The Poetics translated by S. H. Butcher/Whole text"
+        ],
+        "opens": "I propose to treat of Poetry in itself",
+        "closes": "the objections of the critics and the answers to these objections."
       },
       "exclude": [
         "anything not by Aristotle or Butcher"

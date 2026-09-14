@@ -65,7 +65,16 @@
       "copy": {
         "site": "wikisource",
         "id": "Thus Spake Zarathustra",
-        "edition": "Modern Library, 1917, scan"
+        "edition": "Modern Library, 1917, scan",
+        "pages": [
+          "Thus Spake Zarathustra/Prologue",
+          "Thus Spake Zarathustra/Part One",
+          "Thus Spake Zarathustra/Part Two",
+          "Thus Spake Zarathustra/Part Three",
+          "Thus Spake Zarathustra/Part Four"
+        ],
+        "opens": "When Zarathustra was thirty years old, he left his home",
+        "closes": "like a morning sun coming out of gloomy mountains."
       },
       "exclude": [
         "introduction by Elisabeth Foerster-Nietzsche",
@@ -85,7 +94,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 4363,
-        "edition": "reprint of The Complete Works of Friedrich Nietzsche, 1909-1913, as stated by the transcriber"
+        "edition": "reprint of The Complete Works of Friedrich Nietzsche, 1909-1913, as stated by the transcriber",
+        "keep": [
+          [
+            "SUPPOSING that Truth is a woman...",
+            "FROM THE HEIGHTS"
+          ]
+        ],
+        "opens": "SUPPOSING that Truth is a woman",
+        "closes": "my old, beloved--EVIL thoughts!"
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

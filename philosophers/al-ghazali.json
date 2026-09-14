@@ -53,7 +53,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 58977,
-        "edition": "John Murray, Wisdom of the East, 1909"
+        "edition": "John Murray, Wisdom of the East, 1909",
+        "keep": [
+          [
+            "GHAZZALI’S SEARCH FOR TRUTH",
+            "FOOTNOTES"
+          ]
+        ],
+        "opens": "Glory be to God, Whose praise should precede every writing",
+        "closes": "that they may adore none beside Him."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -74,7 +82,19 @@
       "copy": {
         "site": "wikisource",
         "id": "The Alchemy of Happiness (Field)",
-        "edition": "John Murray, Wisdom of the East, 1910, scan"
+        "edition": "John Murray, Wisdom of the East, 1910, scan",
+        "pages": [
+          "The Alchemy of Happiness (Field)/Chapter I",
+          "The Alchemy of Happiness (Field)/Chapter II",
+          "The Alchemy of Happiness (Field)/Chapter III",
+          "The Alchemy of Happiness (Field)/Chapter IV",
+          "The Alchemy of Happiness (Field)/Chapter V",
+          "The Alchemy of Happiness (Field)/Chapter VI",
+          "The Alchemy of Happiness (Field)/Chapter VII",
+          "The Alchemy of Happiness (Field)/Chapter VIII"
+        ],
+        "opens": "Knowledge of self is the key to the knowledge of God",
+        "closes": "as an angry lion who fears nothing."
       },
       "exclude": [
         "editorial note",

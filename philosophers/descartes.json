@@ -54,21 +54,143 @@
       "copy": {
         "site": "wikisource",
         "id": "Discourse on the Method",
-        "edition": "Sutherland and Knox, 1853, scan"
+        "edition": "Sutherland and Knox, 1853, scan",
+        "pages": [
+          "Discourse on the Method/Prefatory Note by the Author",
+          "Discourse on the Method/Part 1",
+          "Discourse on the Method/Part 2",
+          "Discourse on the Method/Part 3",
+          "Discourse on the Method/Part 4",
+          "Discourse on the Method/Part 5",
+          "Discourse on the Method/Part 6"
+        ],
+        "opens": "If this Discourse appear too long to be read at once",
+        "closes": "than to any who might offer me the highest earthly preferments."
       },
       "exclude": []
     },
     {
       "title": "Meditations",
-      "published": 1853,
+      "published": 1907,
       "translators": [
         {
           "name": "John Veitch",
           "died": 1894
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "wikisource",
+        "id": "Meditations on First Philosophy",
+        "edition": "Wikisource transcription (source not given), read against the William Blackwood and Sons 1907 scan, archive.org methodmeditat00desc leaves 272-360",
+        "pages": [
+          "Meditations on First Philosophy/*"
+        ],
+        "numbered": true,
+        "fixes": [
+          [
+            "* The square brackets, here and throughout the volume, are used to mark additions to the original of the revised French translation.",
+            ""
+          ],
+          [
+            "the judgment of my readers in",
+            "the judgments of my reader in"
+          ],
+          [
+            "able to forsee all",
+            "able to foresee all"
+          ],
+          [
+            "each ones I shall",
+            "each one, I shall"
+          ],
+          [
+            "that I reach the state",
+            "that I reached the state"
+          ],
+          [
+            "occurred to me that God might",
+            "occurred to me that a God might"
+          ],
+          [
+            "a goat or chimera",
+            "a goat or a chimera"
+          ],
+          [
+            "their true origin. What I have here",
+            "their true origin; and what I have here"
+          ],
+          [
+            "that I believed existence of",
+            "that I believed in the existence of"
+          ],
+          [
+            "the reality which considered in these",
+            "the reality which is considered in these"
+          ],
+          [
+            "although they were, apart from",
+            "although there were, apart from"
+          ],
+          [
+            "from my imperfections as I before",
+            "from my imperfection], as I before"
+          ],
+          [
+            "is inclosed;",
+            "is enclosed;"
+          ],
+          [
+            "deny that we may have",
+            "deny that he may have"
+          ],
+          [
+            "compel me to assert to what",
+            "compel me to assent to what"
+          ],
+          [
+            "mathematics to be. Indeed such a doctrine",
+            "mathematics to be, although indeed such a doctrine"
+          ],
+          [
+            "of a [rectilinear] triangle",
+            "of a [rectilineal] triangle"
+          ],
+          [
+            "considering a rectilinear figure",
+            "considering a rectilineal figure"
+          ],
+          [
+            "more easily then the fact",
+            "more easily than the fact"
+          ],
+          [
+            "the [rectilinear] triangle",
+            "the [rectilineal] triangle"
+          ],
+          [
+            "Further, I cannot doubt",
+            "Farther, I cannot doubt"
+          ],
+          [
+            "common sense (senses communis)",
+            "common sense (sensus communis)"
+          ],
+          [
+            "truth of these presentations",
+            "truth of those presentations"
+          ],
+          [
+            "ac. knowledge the weakness",
+            "acknowledge the weakness"
+          ]
+        ],
+        "opens": "The motive which impels me to present this Treatise to you",
+        "closes": "the weakness of our nature."
+      },
+      "exclude": [
+        "translator's introduction and notes",
+        "running heads and page numbers"
+      ]
     }
   ]
 }

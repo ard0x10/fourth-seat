@@ -60,7 +60,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 4705,
-        "edition": "text of the author"
+        "edition": "text of the author",
+        "keep": [
+          [
+            "ADVERTISEMENT.",
+            null
+          ]
+        ],
+        "opens": "My design in the present work is sufficiently explained",
+        "closes": "I should have been nearer the truth."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -73,7 +81,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 9662,
-        "edition": "posthumous edition of 1777, Selby-Bigge second edition, 1902"
+        "edition": "posthumous edition of 1777, Selby-Bigge second edition, 1902",
+        "keep": [
+          [
+            "SECTION I.",
+            "INDEX"
+          ]
+        ],
+        "opens": "Moral philosophy, or the science of human nature, may be treated after two different manners",
+        "closes": "it can contain nothing but sophistry and illusion."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -87,7 +103,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 4583,
-        "edition": "text of the author"
+        "edition": "text of the author",
+        "keep": [
+          [
+            "PAMPHILUS TO HERMIPPUS",
+            null
+          ]
+        ],
+        "opens": "It has been remarked, my HERMIPPUS",
+        "closes": "approach still nearer to the truth."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

@@ -54,7 +54,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 61,
-        "edition": "English edition of 1888, edited by Friedrich Engels"
+        "edition": "English edition of 1888, edited by Friedrich Engels",
+        "keep": [
+          [
+            "A spectre is haunting Europe...",
+            null
+          ]
+        ],
+        "opens": "A spectre is haunting Europe",
+        "closes": "WORKING MEN OF ALL COUNTRIES, UNITE!"
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
@@ -74,8 +82,163 @@
           "died": 1898
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "marxists",
+        "pages": [
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch01.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch02.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch03.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch04.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch05.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch06.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch07.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch08.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch09.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch10.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch11.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch12.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch13.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch14.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch15.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch16.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch17.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch18.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch19.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch20.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch21.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch22.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch23.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch24.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch25.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch26.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch27.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch28.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch29.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch30.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch31.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch32.htm",
+          "https://www.marxists.org/archive/marx/works/1867-c1/ch33.htm"
+        ],
+        "edition": "marxists.org transcription of the 1887 English edition, same translation as the Swan Sonnenschein 1891 scan by word difference rate (archive.org capitalcriticala0000karl); passages added later from the 4th German edition and editors' translations are cut",
+        "cuts": [
+          [
+            "The Two Poles of the Expression",
+            "of Value to the Money-Form"
+          ],
+          [
+            "(And not only for others, without",
+            "by means of an exchange.)"
+          ],
+          [
+            "These are the beauties of “free”",
+            "Ed. ]"
+          ],
+          [
+            "Therefore, however much the capitalist mode",
+            "the laws of capitalist appropriation."
+          ],
+          [
+            "A. England from 1846-1866 B. The",
+            "British Agricultural Proletariat F. Ireland"
+          ],
+          [
+            "the progress of accumulation increases the material amenable to",
+            "which necessarily follows from this"
+          ],
+          [
+            "[Paris is certainly worth a mass]",
+            ""
+          ],
+          [
+            "[“These have one mind, and shall",
+            "of his name.” Revelations, 13:17.]"
+          ],
+          [
+            "[“Everything is for the best in",
+            "worlds.” – Voltaire, Candide ]"
+          ],
+          [
+            "[other things being equal]",
+            ""
+          ],
+          [
+            "[Roman citizen]",
+            ""
+          ],
+          [
+            "[the Royal “we,” i.e., speaking on behalf of his subjects]",
+            ""
+          ],
+          [
+            "[before your own eyes]",
+            ""
+          ],
+          [
+            "[It is of you that the",
+            "story is told – Horace]"
+          ],
+          [
+            "[After me, the flood]",
+            ""
+          ],
+          [
+            "[the like]",
+            ""
+          ],
+          [
+            "[war of all against all – Hobbes]",
+            ""
+          ],
+          [
+            "[In this town, about twenty years",
+            "the use of this instrument.]"
+          ],
+          [
+            "[that’s all]",
+            ""
+          ],
+          [
+            "[all the same]",
+            ""
+          ],
+          [
+            "[placeholder]",
+            ""
+          ],
+          [
+            "[the outermost limit]",
+            ""
+          ],
+          [
+            "[v. 35 MECW p. 520]",
+            ""
+          ],
+          [
+            "[greek: tokos]",
+            ""
+          ],
+          [
+            "[A cruel fate torments the Romans, and the crime of fratricide]",
+            ""
+          ],
+          [
+            "[“In the beginning was the deed.” – Goethe, Faust .]",
+            ""
+          ],
+          [
+            "[What a great change from that time! – Virgil]",
+            ""
+          ]
+        ],
+        "opens": "The wealth of those societies in which the capitalist mode of production prevails",
+        "closes": "the expropriation of the labourer."
+      },
+      "exclude": [
+        "prefaces",
+        "notes",
+        "running heads and page numbers",
+        "works and authors quoted, index"
+      ]
     },
     {
       "title": "Theses on Feuerbach",
@@ -89,7 +252,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 27814,
-        "edition": "Charles H. Kerr, 1903"
+        "edition": "Charles H. Kerr, 1903",
+        "keep": [
+          [
+            "APPENDIX. >> I.",
+            null
+          ]
+        ],
+        "opens": "The chief lack of all materialistic philosophy up to the present",
+        "closes": "the point is to change it."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",

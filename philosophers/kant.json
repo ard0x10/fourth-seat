@@ -75,33 +75,71 @@
       "copy": {
         "site": "wikisource",
         "id": "Critique of Pure Reason (Meiklejohn)",
-        "edition": "Henry G. Bohn, 1855, scan"
+        "edition": "Henry G. Bohn, 1855, scan",
+        "pages": [
+          "Critique of Pure Reason (Meiklejohn)/*"
+        ],
+        "skipPages": [
+          "Critique of Pure Reason (Meiklejohn)/Translator's Preface"
+        ],
+        "opens": "Human reason, in one sphere of its cognition",
+        "closes": "engaged her ardent desire for knowledge."
       },
       "exclude": []
     },
     {
       "title": "Fundamental Principles of the Metaphysic of Morals",
-      "published": 1879,
+      "published": 1898,
       "translators": [
         {
           "name": "Thomas Kingsmill Abbott",
           "died": 1913
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "gutenberg",
+        "id": 5682,
+        "edition": "Project Gutenberg 5682 (edition not given), same translation as the Longmans, Green, and Co. 1898 scan by word difference rate, archive.org kantscritiqueof00kant",
+        "keep": [
+          [
+            "PREFACE",
+            "THE END"
+          ]
+        ],
+        "opens": "Ancient Greek philosophy was divided into three sciences",
+        "closes": "the very limit of human reason."
+      },
+      "exclude": [
+        "translator's memoir of Kant and notes",
+        "running heads, page numbers and Rosenkranz page references"
+      ]
     },
     {
       "title": "Critique of Practical Reason",
-      "published": 1879,
+      "published": 1898,
       "translators": [
         {
           "name": "Thomas Kingsmill Abbott",
           "died": 1913
         }
       ],
-      "copy": null,
-      "exclude": []
+      "copy": {
+        "site": "gutenberg",
+        "id": 5683,
+        "edition": "Project Gutenberg 5683 (edition not given), same translation as the Longmans, Green, and Co. 1898 scan by word difference rate, archive.org kantscritiqueof00kant",
+        "keep": [
+          [
+            "PREFACE.",
+            "THE END"
+          ]
+        ],
+        "opens": "is called the",
+        "closes": "which such an examination first puts in a clear light."
+      },
+      "exclude": [
+        "translator's notes",
+        "running heads, page numbers and Rosenkranz page references"
+      ]
     },
     {
       "title": "Critique of Judgement",
@@ -115,7 +153,15 @@
       "copy": {
         "site": "gutenberg",
         "id": 48433,
-        "edition": "Macmillan, second edition revised, 1914"
+        "edition": "Macmillan, second edition revised, 1914",
+        "keep": [
+          [
+            "PREFACE",
+            "THE END"
+          ]
+        ],
+        "opens": "We may call the faculty of cognition from principles a priori",
+        "closes": "base it satisfactorily on its proofs."
       },
       "exclude": [
         "Project Gutenberg license, header and footer, and every mention of Project Gutenberg",
