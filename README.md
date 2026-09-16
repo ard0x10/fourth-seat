@@ -1,8 +1,13 @@
-# Fourth Seat
+<h1 align="center">Fourth Seat</h1>
 
-Eight tables in a dark room, three philosophers at each, and one empty chair. You take it.
+<p align="center">Eight tables in a dark room, three philosophers at each, and one empty chair.<br>
+You take it.</p>
 
-**https://ard0x10.github.io/fourth-seat/**
+<p align="center"><b><a href="https://ard0x10.github.io/fourth-seat/">ard0x10.github.io/fourth-seat</a></b></p>
+
+![The eight tables in the dark, each one a question with the three philosophers who argue about it](docs/images/01-tables.png)
+
+---
 
 Every table is a question. Plato, Aristotle and Heidegger argue about what is real; Camus,
 Cioran and Nietzsche ask why anyone should live in a world without meaning. They were
@@ -19,10 +24,17 @@ already talking before you sat down, and when you speak, they answer you and eac
 | Science | What makes science science? | Bacon, Popper, Kuhn |
 | Meaning | Why live in a world without meaning? | Camus, Cioran, Nietzsche |
 
+## Standing at the table
+
+![The Being table, with a line from Plato, Aristotle and Heidegger above their chairs](docs/images/02-table.png)
+
+Pick a table and the argument is already running: three written openings, played in turn,
+with nothing to sign up for and nothing to pay. You can listen at all eight tables and
+never say a word.
+
 ## Sitting down
 
-Pick a table and you hear a written opening right away, no account needed. Each table has
-three, and they take turns.
+![The same table turned towards the empty chair, the three openings behind it and a box to answer in](docs/images/03-seat.png)
 
 To talk back, connect an [OpenRouter](https://openrouter.ai) account. You sign in on
 OpenRouter's own page and come back to the same table with your message still in the box.
@@ -48,9 +60,6 @@ appears on screen as a quote.
 The search runs in a web worker in your browser, and a table's books load only when you sit
 at it.
 
-The Meaning table shows a card every time you sit there, with a link to
-[findahelpline.com](https://findahelpline.com).
-
 ## The books
 
 All 32 works are English translations in the public domain, taken only from a copy whose
@@ -75,6 +84,13 @@ python scripts/build-corpus.py --only kant
 ```
 
 Downloads are cached in `scripts/.cache/`.
+
+## The Meaning table
+
+![A card over the Meaning table, offering a helpline before the seat is taken](docs/images/04-care.png)
+
+The Meaning table talks about life, death and despair, so it says so before you sit down,
+every time, with a link to [findahelpline.com](https://findahelpline.com).
 
 ## Running it locally
 
